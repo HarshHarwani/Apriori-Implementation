@@ -1,2 +1,2 @@
 # Apriori-Implementation
-Apriori Implementation for generating frequent item data sets
+Apriori Implementation for generating frequent items and  Association Rules from Frequent Itemsets
