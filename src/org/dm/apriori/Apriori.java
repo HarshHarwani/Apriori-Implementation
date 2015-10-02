@@ -21,7 +21,7 @@ public class Apriori {
                     .generateLFromCBySupport(cSetWithSupportCount,
                             support);
             System.out.println("Frequent item set of size " + (i + 1)
-                    + "is-->" + lSet.size());
+                    + " is --> " + lSet.size());
             finalResult.putAll(lSet);
         }
         return finalResult;
