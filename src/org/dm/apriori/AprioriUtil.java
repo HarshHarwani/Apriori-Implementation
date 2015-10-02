@@ -114,53 +114,85 @@ public class AprioriUtil {
         }
         return Lset;
     }
-    
-    public static Set<String> getMatchingAssociations(List<String> associations, String type, int count, List<String> terms ) {
-    		
-    	Set<String> resultSet = new HashSet<String>();
-    	for(String association: associations) {
-    		
-    		if(isMatchingAssociation(association, type, count, terms)) {
-    			resultSet.add(association);
-    		}
-    	}
-    	
-    	return resultSet;
+
+    public static Set<String> getMatchingAssociations(List<String> associations, String type, int count, List<String> terms, int templateType ) {
+
+        Set<String> resultSet = new HashSet<String>();
+        for(String association: associations) {
+            if(templateType == 1){
+                if(isMatchingAssociation(association, type, count, terms)) {
+                    resultSet.add(association);
+                }
+            } else if(templateType == 2){
+                if(templateTwoFilter(association, type, count)) {
+                    resultSet.add(association);
+                }
+            }
+        }
+
+        return resultSet;
     }
-    
+
     private static boolean isMatchingAssociation(String association, String type, int count, List<String> terms) {
-    	//Set<String> resultSet = new HashSet<String>();
-    	int matched = 0;
-    	String body = association.split("-->")[0];
-    	String head = association.split("-->")[1];
-    	for(String term: terms) {
-    		switch(type) {
-    			case "RULE":
-    				if(association.contains(term))
-    					matched++;
-    				break;
-    				
-    			case "BODY":
-    				if(body.contains(term)) 
-    					matched++;
-    				break;
-    				
-    			case "HEAD":
-    				if(head.contains(term))
-    					matched++;
-    				break;
-    				
-    			default:
-    				break;
-    		}
-    	}
-    	
-    	if(matched==0 && count==0){
-    		return true;
-    	}else if(matched >= count && count!=0){
-    		return true;
-    	}
-    	
-    	return false;
+        //Set<String> resultSet = new HashSet<String>();
+        int matched = 0;
+        String body = association.split("-->")[0];
+        String head = association.split("-->")[1];
+        for(String term: terms) {
+            switch(type) {
+                case "RULE":
+                    if(association.contains(term))
+                        matched++;
+                    break;
+
+                case "BODY":
+                    if(body.contains(term))
+                        matched++;
+                    break;
+
+                case "HEAD":
+                    if(head.contains(term))
+                        matched++;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        if(count == 0 && matched == 0) {
+            return true;
+        } else if(count > 0 && matched == count) {
+            return true;
+        } else if(count == -1 && matched >= 1) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static boolean templateTwoFilter(String association, String type, int count){
+        int size = 0;
+        switch(type) {
+            case "RULE":
+                size = association.split("-->")[0].split(",").length + association.split("-->")[1].split(",").length;
+                break;
+
+            case "BODY":
+                size = association.split("-->")[0].split(",").length;
+                break;
+
+            case "HEAD":
+                size = association.split("-->")[1].split(",").length;
+                break;
+
+            default:
+                break;
+        }
+
+        if(size >= count){
+            return true;
+        }
+        return false;
     }
 }
