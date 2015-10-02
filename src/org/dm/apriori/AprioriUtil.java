@@ -26,8 +26,8 @@ public class AprioriUtil {
                     Map<String, Boolean> map = new TreeMap<String, Boolean>();
                     for (int i = 1; i < brokenLine.length - 1; i++) {
                         String actualValue = brokenLine[i];
-                        String gene_up = "gene_" + i + "_up";
-                        String gene_down = "gene_" + i + "_down";
+                        String gene_up = "Gene" + i + "_UP";
+                        String gene_down = "Gene" + i + "_DOWN";
                         if (actualValue.equalsIgnoreCase("up")) {
                             map.put(gene_up, true);
                             map.put(gene_down, false);
@@ -79,9 +79,11 @@ public class AprioriUtil {
                 minsupport);
     }
 
-    public static Map<Set<String>, Integer> calculateSupportCount(Map<Set<String>, Integer> candidateSet,List<Map<String, Boolean>> dataList) {
-        
-        //calculating support for each of the set in the candidate set.
+    public static Map<Set<String>, Integer> calculateSupportCount(
+            Map<Set<String>, Integer> candidateSet,
+            List<Map<String, Boolean>> dataList) {
+
+        // calculating support for each of the set in the candidate set.
         for (Set<String> set : candidateSet.keySet())
             for (Map<String, Boolean> map : dataList) {
                 boolean flag = true;
@@ -98,8 +100,10 @@ public class AprioriUtil {
             }
         return candidateSet;
     }
+
     public static Map<Set<String>, Integer> generateLFromCBySupport(
-            //removing the elements from the candidateset with their support less than the minimum support
+            // removing the elements from the candidateset with their support
+            // less than the minimum support
             Map<Set<String>, Integer> candidateSet, int minsupport) {
         Map<Set<String>, Integer> Lset = new HashMap<Set<String>, Integer>();
         for (Set<String> set : candidateSet.keySet()) {
