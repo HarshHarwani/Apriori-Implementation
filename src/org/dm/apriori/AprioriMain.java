@@ -51,5 +51,8 @@ public class AprioriMain {
         
         //**********************************************************************************
 
+        Set<String> result = AprioriUtil.getMatchingAssociations(newAssList, "RULE", 0, new ArrayList<String>(Arrays.asList("Gene54_UP", "Gene24_DOWN")) );
+        System.out.println("SIZE: "+result.size());
+        System.out.println("RESULTS "+result);
     }
 }

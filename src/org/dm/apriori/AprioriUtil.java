@@ -114,4 +114,53 @@ public class AprioriUtil {
         }
         return Lset;
     }
+    
+    public static Set<String> getMatchingAssociations(List<String> associations, String type, int count, List<String> terms ) {
+    		
+    	Set<String> resultSet = new HashSet<String>();
+    	for(String association: associations) {
+    		
+    		if(isMatchingAssociation(association, type, count, terms)) {
+    			resultSet.add(association);
+    		}
+    	}
+    	
+    	return resultSet;
+    }
+    
+    private static boolean isMatchingAssociation(String association, String type, int count, List<String> terms) {
+    	//Set<String> resultSet = new HashSet<String>();
+    	int matched = 0;
+    	String body = association.split("-->")[0];
+    	String head = association.split("-->")[1];
+    	for(String term: terms) {
+    		switch(type) {
+    			case "RULE":
+    				if(association.contains(term))
+    					matched++;
+    				break;
+    				
+    			case "BODY":
+    				if(body.contains(term)) 
+    					matched++;
+    				break;
+    				
+    			case "HEAD":
+    				if(head.contains(term))
+    					matched++;
+    				break;
+    				
+    			default:
+    				break;
+    		}
+    	}
+    	
+    	if(matched==0 && count==0){
+    		return true;
+    	}else if(matched >= count && count!=0){
+    		return true;
+    	}
+    	
+    	return false;
+    }
 }
