@@ -80,6 +80,8 @@ public class AprioriUtil {
     }
 
     public static Map<Set<String>, Integer> calculateSupportCount(Map<Set<String>, Integer> candidateSet,List<Map<String, Boolean>> dataList) {
+        
+        //calculating support for each of the set in the candidate set.
         for (Set<String> set : candidateSet.keySet())
             for (Map<String, Boolean> map : dataList) {
                 boolean flag = true;
@@ -96,8 +98,8 @@ public class AprioriUtil {
             }
         return candidateSet;
     }
-
     public static Map<Set<String>, Integer> generateLFromCBySupport(
+            //removing the elements from the candidateset with their support less than the minimum support
             Map<Set<String>, Integer> candidateSet, int minsupport) {
         Map<Set<String>, Integer> Lset = new HashMap<Set<String>, Integer>();
         for (Set<String> set : candidateSet.keySet()) {

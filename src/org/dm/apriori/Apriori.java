@@ -26,7 +26,7 @@ public class Apriori {
         }
         return finalResult;
     }
-    
+    //for creating join of two sets
     private Map<Set<String>, Integer> selfJoin(
             Map<Set<String>, Integer> lSet) {
         List<Set<String>> set=new ArrayList<Set<String>>();
@@ -42,16 +42,16 @@ public class Apriori {
                         count++;
                 }
                 if(count==set1.size()-1){
-                    Set<String> newset=new HashSet<String>();
-                    newset.addAll(set1);
-                    newset.addAll(set2);
-                    resultSet.put(newset, 0);
+                    Set<String> newSet=new HashSet<String>();
+                    newSet.addAll(set1);
+                    newSet.addAll(set2);
+                    resultSet.put(newSet, 0);
                 }
             }
         }
         return resultSet;
     }
-
+    
     private Map<Set<String>, Integer> generateCandidatesAndPrune(
             Map<Set<String>, Integer> lSet) {
 
@@ -60,7 +60,7 @@ public class Apriori {
                 lSet);
         return prunedResult;
     }
-
+  //for pruning the data based on the apriori property
     private Map<Set<String>, Integer> prune(
             Map<Set<String>, Integer> joinResult,
             Map<Set<String>, Integer> lSet) {
@@ -74,12 +74,11 @@ public class Apriori {
                 if(flag){
                     prunedResult.put(set,joinResult.get(set));
                 }
-                    
             }
         }
         return prunedResult;
     }
-
+    //for generating subsets of size n-1
     private List<Set<String>> generateSubsets(Set<String> set) {
         List<Set<String>> subsets=new ArrayList<Set<String>>();
         List<String> list=new ArrayList<String>();
@@ -99,7 +98,7 @@ public class Apriori {
         subsets.add(newSet);
         return subsets;
     }
-
+    //generating association rules frpm the frequent item sets.
     public List<String> generateAssociationRules(
             Map<Set<String>, Integer> finalSet,
             int confidence) {
@@ -124,7 +123,7 @@ public class Apriori {
         }
         return assList;
     }
-
+    //for calculating the support of a particular set in the dataList
     private int calculateSupport(Set<String> set) {
         List<Map<String, Boolean>> dataList=AprioriMain.dataList;
         Map<Set<String>, Integer> subMap=new HashMap<Set<String>, Integer>();
@@ -143,7 +142,7 @@ public class Apriori {
         }
         return subMap.get(set);
     }
-
+    //for getting all the subsets of a set, it is useful in generating association rules
     private Set<Set<String>> getPowerSet(Set<String> originalSet) {
         Set<Set<String>> sets = new HashSet<Set<String>>();
         if (originalSet.isEmpty()) {
