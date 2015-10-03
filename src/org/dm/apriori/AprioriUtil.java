@@ -4,12 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 public class AprioriUtil {
 
@@ -115,16 +110,103 @@ public class AprioriUtil {
         return Lset;
     }
 
-    public static Set<String> getMatchingAssociations(List<String> associations, String type, int count, List<String> terms, int templateType ) {
+    public static Set<String> getResultSet(List<String> associations, String query) {
+        String[] queries;
+        String queryOne, queryTwo = null;
+        int queryOneTemplate = 1, queryTwoTemplate = 1;
+        boolean isAND = false, isOR = false;
+
+        queries = query.split(" AND ");
+
+        if (queries.length <= 1) {
+            queries = query.split(" OR ");
+            if (queries.length > 1) {
+                queryTwo = queries[1];
+                isOR = true;
+            }
+
+        } else {
+            queryTwo = queries[1];
+            isAND = true;
+        }
+        queryOne = queries[0];
+
+        Set<String> resultSetQueryTwo = null;
+
+        if (queryTwo != null) {
+            int occurrencesForQueryTwo;
+            List<String> termsInQueryTwo;
+            String typeTwo;
+            if (queryTwo.contains("SizeOf(")) {
+                queryTwoTemplate = 2;
+                typeTwo = queryTwo.substring(7,11);
+                occurrencesForQueryTwo = Integer.parseInt(queryTwo.split(" ")[2]);
+                termsInQueryTwo = null;
+            } else {
+                String[] queryTwoTerms = queryTwo.split(" ");
+                typeTwo = queryTwoTerms[0];
+
+                queryTwoTerms[2] = queryTwoTerms[2].replace("(", "").replace(")", "");
+
+                if(queryTwoTerms[2].equals("ANY")){
+                    occurrencesForQueryTwo = -1;
+                } else if(queryTwoTerms[2].equals("NONE")) {
+                    occurrencesForQueryTwo = 0;
+                } else {
+                    occurrencesForQueryTwo = Integer.parseInt(queryTwoTerms[2]);
+                }
+                termsInQueryTwo = new ArrayList(Arrays.asList(queryTwoTerms[4].replace("(", "").replace(")", "").split(",")));
+            }
+            resultSetQueryTwo = evaluateQuery(associations, typeTwo, occurrencesForQueryTwo, termsInQueryTwo, queryTwoTemplate);
+        }
+
+        String[] queryOneTerms;
+        String typeOne;
+        int occurrencesForQueryOne;
+        List<String> termsInQueryOne = null;
+        if (queryOne.contains("SizeOf(")) {
+            queryOneTemplate = 2;
+            typeOne = queryOne.substring(7,11);
+            occurrencesForQueryOne = Integer.parseInt(queryOne.split(" ")[2]);
+            termsInQueryOne = null;
+        } else{
+            queryOneTerms = queryOne.split(" ");
+            typeOne = queryOneTerms[0];
+            //int occurrencesForQueryOne = Integer.parseInt(queryOneTerms[2].replace("(", "").replace(")", ""));
+            queryOneTerms[2] = queryOneTerms[2].replace("(", "").replace(")", "");
+
+            if(queryOneTerms[2].equals("ANY")){
+                occurrencesForQueryOne = -1;
+            } else if(queryOneTerms[2].equals("NONE")) {
+                occurrencesForQueryOne = 0;
+            } else {
+                occurrencesForQueryOne = Integer.parseInt(queryOneTerms[2]);
+            }
+            termsInQueryOne = new ArrayList(Arrays.asList(queryOneTerms[4].replace("(", "").replace(")", "").split(",")));
+        }
+
+
+        Set<String> resultSetQueryOne = evaluateQuery(associations, typeOne, occurrencesForQueryOne, termsInQueryOne, queryOneTemplate);
+
+        if (isAND) {
+            resultSetQueryOne.retainAll(resultSetQueryTwo);
+        } else if (isOR) {
+            resultSetQueryOne.addAll(resultSetQueryTwo);
+        }
+
+        return resultSetQueryOne;
+    }
+
+    private static Set<String> evaluateQuery(List<String> associations, String type, int count, List<String> terms, int templateType) {
 
         Set<String> resultSet = new HashSet<String>();
-        for(String association: associations) {
-            if(templateType == 1){
-                if(isMatchingAssociation(association, type, count, terms)) {
+        for (String association : associations) {
+            if (templateType == 1) {
+                if (isMatchingAssociation(association, type, count, terms)) {
                     resultSet.add(association);
                 }
-            } else if(templateType == 2){
-                if(templateTwoFilter(association, type, count)) {
+            } else if (templateType == 2) {
+                if (templateTwoFilter(association, type, count)) {
                     resultSet.add(association);
                 }
             }
@@ -138,20 +220,20 @@ public class AprioriUtil {
         int matched = 0;
         String body = association.split("-->")[0];
         String head = association.split("-->")[1];
-        for(String term: terms) {
-            switch(type) {
+        for (String term : terms) {
+            switch (type) {
                 case "RULE":
-                    if(association.contains(term))
+                    if (association.contains(term))
                         matched++;
                     break;
 
                 case "BODY":
-                    if(body.contains(term))
+                    if (body.contains(term))
                         matched++;
                     break;
 
                 case "HEAD":
-                    if(head.contains(term))
+                    if (head.contains(term))
                         matched++;
                     break;
 
@@ -160,20 +242,20 @@ public class AprioriUtil {
             }
         }
 
-        if(count == 0 && matched == 0) {
+        if (count == 0 && matched == 0) {
             return true;
-        } else if(count > 0 && matched == count) {
+        } else if (count > 0 && matched == count) {
             return true;
-        } else if(count == -1 && matched >= 1) {
+        } else if (count == -1 && matched >= 1) {
             return true;
         }
 
         return false;
     }
 
-    private static boolean templateTwoFilter(String association, String type, int count){
+    private static boolean templateTwoFilter(String association, String type, int count) {
         int size = 0;
-        switch(type) {
+        switch (type) {
             case "RULE":
                 size = association.split("-->")[0].split(",").length + association.split("-->")[1].split(",").length;
                 break;
@@ -190,7 +272,7 @@ public class AprioriUtil {
                 break;
         }
 
-        if(size >= count){
+        if (size >= count) {
             return true;
         }
         return false;
